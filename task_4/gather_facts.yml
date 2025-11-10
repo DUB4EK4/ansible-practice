@@ -1,0 +1,16 @@
+---
+- name: Gather system facts
+  hosts: all
+  gather_facts: yes
+  tasks:
+    - name: Show number of CPUs
+      debug:
+        msg: "CPU: {{ ansible_facts['processor_cores'] | default(ansible_facts['processor_count']) }}"
+
+    - name: Show total RAM in MB
+      debug:
+        msg: "RAM: {{ ansible_facts['memtotal_mb'] }} MB"
+
+    - name: Show hostname
+      debug:
+        msg: "Hostname: {{ ansible_facts['hostname'] }}"
