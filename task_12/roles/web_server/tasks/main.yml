@@ -1,0 +1,71 @@
+---
+- name: Install nginx on Ubuntu
+  apt:
+    name: nginx
+    state: present
+  when: "'ubuntu' in group_names"
+
+- name: Install httpd on Fedora
+  dnf:
+    name: httpd
+    state: present
+  when: "'fedora' in group_names"
+
+- name: Copy index.html to Ubuntu
+  copy:
+    src: index.html
+    dest: /var/www/html/index.html
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  when: "'ubuntu' in group_names"
+
+- name: Copy index.html to Fedora
+  copy:
+    src: index.html
+    dest: /var/www/html/index.html
+    owner: apache
+    group: apache
+    mode: '0644'
+  when: "'fedora' in group_names"
+
+- name: Ensure nginx is running on Ubuntu
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+  when: "'ubuntu' in group_names"
+
+- name: Ensure httpd is running on Fedora
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+  when: "'fedora' in group_names"
+
+- name: Open port 80 on Ubuntu using ufw
+  ufw:
+    rule: allow
+    port: 80
+    proto: tcp
+  when: "'ubuntu' in group_names"
+
+- name: Ensure ufw is enabled on Ubuntu
+  ufw:
+    state: enabled
+  when: "'ubuntu' in group_names"
+
+- name: Open port 80 on Fedora using firewalld
+  firewalld:
+    service: http
+    permanent: yes
+    state: enabled
+    immediate: yes
+  when: "'fedora' in group_names"
+
+- name: Ensure firewalld is running on Fedora
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
+  when: "'fedora' in group_names"
