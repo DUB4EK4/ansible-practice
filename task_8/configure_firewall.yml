@@ -1,0 +1,31 @@
+---
+- name: Configure firewall to allow HTTP
+  hosts: all
+  become: yes
+  tasks:
+    - name: Open port 80 on Ubuntu using ufw
+      ufw:
+        rule: allow
+        port: 80
+        proto: tcp
+      when: "'ubuntu' in group_names"
+
+    - name: Ensure ufw is enabled on Ubuntu
+      ufw:
+        state: enabled
+      when: "'ubuntu' in group_names"
+
+    - name: Open port 80 on Fedora using firewalld
+      firewalld:
+        service: http
+        permanent: yes
+        state: enabled
+        immediate: yes
+      when: "'fedora' in group_names"
+
+    - name: Ensure firewalld is running on Fedora
+      service:
+        name: firewalld
+        state: started
+        enabled: yes
+      when: "'fedora' in group_names"
