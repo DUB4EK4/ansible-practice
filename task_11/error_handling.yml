@@ -1,0 +1,30 @@
+---
+- name: Test error handling for non-existent package
+  hosts: all
+  become: yes
+  tasks:
+    - name: Try to install non-existent package on Ubuntu
+      apt:
+        name: nonexistent-package
+        state: present
+      ignore_errors: yes
+      register: ubuntu_result
+      when: "'ubuntu' in group_names"
+
+    - name: Try to install non-existent package on Fedora
+      dnf:
+        name: nonexistent-package
+        state: present
+      ignore_errors: yes
+      register: fedora_result
+      when: "'fedora' in group_names"
+
+    - name: Report error on Ubuntu
+      debug:
+        msg: "Пакет не найден на Ubuntu"
+      when: ubuntu_result is failed
+
+    - name: Report error on Fedora
+      debug:
+        msg: "Пакет не найден на Fedora"
+      when: fedora_result is failed
