@@ -1,0 +1,30 @@
+---
+- name: Install web server packages using variables
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install nginx on Ubuntu
+      apt:
+        name: "nginx={{ nginx_version }}"
+        state: present
+      when: "'ubuntu' in group_names"
+
+    - name: Install httpd on Fedora
+      dnf:
+        name: "httpd-{{ httpd_version }}"
+        state: present
+      when: "'fedora' in group_names"
+
+    - name: Ensure nginx is running on Ubuntu
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+      when: "'ubuntu' in group_names"
+
+    - name: Ensure httpd is running on Fedora
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+      when: "'fedora' in group_names"
