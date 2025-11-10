@@ -1,0 +1,31 @@
+---
+- name: Manage users on all nodes
+  hosts: all
+  become: yes
+  vars:
+    ansible_user_name: ansible_user
+    ansible_user_password: "{{ 'P@ssw0rd' | password_hash('sha512') }}"
+  tasks:
+    - name: Create user on Ubuntu
+      user:
+        name: "{{ ansible_user_name }}"
+        password: "{{ ansible_user_password }}"
+        groups: sudo
+        state: present
+      when: "'ubuntu' in group_names"
+
+    - name: Create user on Fedora
+      user:
+        name: "{{ ansible_user_name }}"
+        password: "{{ ansible_user_password }}"
+        groups: wheel
+        state: present
+      when: "'fedora' in group_names"
+
+    - name: Ensure sudo/wheel privileges
+      command: id {{ ansible_user_name }}
+      register: user_check
+
+    - name: Debug user info
+      debug:
+        var: user_check.stdout
