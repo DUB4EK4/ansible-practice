@@ -1,0 +1,22 @@
+---
+- name: Deploy index.html from Jinja2 template
+  hosts: all
+  become: yes
+  tasks:
+    - name: Copy index.html template to Ubuntu
+      template:
+        src: templates/index.html.j2
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'
+      when: "'ubuntu' in group_names"
+
+    - name: Copy index.html template to Fedora
+      template:
+        src: templates/index.html.j2
+        dest: /var/www/html/index.html
+        owner: apache
+        group: apache
+        mode: '0644'
+      when: "'fedora' in group_names"
